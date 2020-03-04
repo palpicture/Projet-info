@@ -11,6 +11,7 @@ namespace Projet_info
         static void Main(string[] args)
         {
             MyImage image = new MyImage("coco.bmp");
+            //image.ConvertToGris();
             image.ConvertToGris();
             image.From_Image_To_File("COCOgris.bmp");
             Console.ReadKey();

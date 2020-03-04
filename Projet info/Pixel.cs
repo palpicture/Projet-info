@@ -22,7 +22,9 @@ namespace Projet_info
         public void ConvertToGris()
         {
             byte gris = (byte)(0.299 * Red + 0.587 * Green + 0.114 * Blue);
-            Red=Green=Blue=gris;
+            tab[0] = gris;
+            tab[1] = gris;
+            tab[2] = gris;
         }
         
     }

@@ -81,18 +81,17 @@ namespace Projet_info
             {
                 myfile[i] = header[i];
             }
-            int index = 14 + offset;
+            int index = 54;
             for (int y=0;y<haut;y++)
             {
-                for(int x =0;x<=large-3;x+=3)
+                for(int x =0;x<=large-3;x++)
                 {
                     myfile[index] = image[y,x].Red;
-                    myfile[index+1] = image[y, x+1].Green;
-                    myfile[index+2] = image[y, x+2].Blue;
+                    myfile[index+1] = image[y, x].Green;
+                    myfile[index+2] = image[y, x].Blue;
                     index += 3;
                 }
             }
-            for(int i = 0; i < 54; i++) { Console.Write(myfile[i]+" "); }
             File.WriteAllBytes(file, myfile);
         } 
 
