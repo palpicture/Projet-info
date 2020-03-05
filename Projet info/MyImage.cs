@@ -84,7 +84,7 @@ namespace Projet_info
             int index = 54;
             for (int y=0;y<haut;y++)
             {
-                for(int x =0;x<=large-3;x++)
+                for(int x =0;x<large;x++)
                 {
                     myfile[index] = image[y,x].Red;
                     myfile[index+1] = image[y, x].Green;
@@ -159,7 +159,7 @@ namespace Projet_info
                 {
                     for (int j = 0; j < this.haut; j++)
                     {
-                        image1[j, i] = image[this.haut - j, i];
+                        image1[j, i] = image[this.haut -1 - j, i];
                     }
                 }
                 image = image1;
