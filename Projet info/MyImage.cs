@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 
+
 namespace Projet_info
 {
     class MyImage
     {
+        //Attributs
         string type;
         int taille;
         int large;
@@ -19,6 +21,7 @@ namespace Projet_info
         Pixel[,] image;
         byte[] header;
 
+        //Constructeur
         public MyImage(string fichier)
         {
             byte[] image = File.ReadAllBytes(fichier);
@@ -34,6 +37,7 @@ namespace Projet_info
 
         }
 
+        //Métohde pour passer d'un tableau de byte en entier avec une boucle for sur tous les bytes du tableau
         private int Convertir_Endian_To_Int(byte[] tab)
         {
             int i = 1;
@@ -46,6 +50,7 @@ namespace Projet_info
             return tot;
         }
 
+        //Méthode pour passer d'un entier en un tableau de bytes avec une boucle for sur le nombre d'octets sur lequel on veut faire la conversion
         private byte[] Convertir_Int_To_Endian(int val, int nboctet)
         {
             int i = val;
@@ -58,7 +63,7 @@ namespace Projet_info
             return tab;
         }
 
-
+        //Méthode pour accéder aux pixels de l'image sans le header
         private Pixel[,] GoImage(byte[] image, int large, int haut, int offset, int taille)
         {
             Pixel[,] tab = new Pixel[haut, large];
@@ -74,6 +79,7 @@ namespace Projet_info
             return tab;
         }
 
+        //Méthode pour passer d'une image à un fichier en recréant le header puis l'image et en le mettant dans un fichier 
         public void From_Image_To_File (string file)
         {
             byte[] myfile = new byte[this.taille];
@@ -94,6 +100,7 @@ namespace Projet_info
             }
             File.WriteAllBytes(file, myfile);
         } 
+
 
         public void ConvertToGris()
         {
@@ -171,6 +178,22 @@ namespace Projet_info
             {
                 Console.WriteLine("Vous n'avez pas choisi V ou H");
             }
+        }
+
+        public void Rotation(int angle)
+        {
+            Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
+            for (int i = 0; i < this.haut; i++)
+            {
+                for (int j = 0; j < this.large; j++)
+                {
+                    int tempj = Convert.ToInt32(i * Math.Cos(angle));
+                    int tempi = Convert.ToInt32(j * Math.Sin(angle));
+                    if (tempi < large && tempj < haut && 0<tempi && 0 < tempj) { image1[i, j] = image[tempj, tempi]; }
+                    else { image1[i, j] = new Pixel((byte)0, (byte)0, (byte)0); }
+                }
+            }
+            image = image1;
         }
     }
 }
