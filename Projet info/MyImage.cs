@@ -134,15 +134,42 @@ namespace Projet_info
                         
                 }
             }
+            taille = (taille - 54) * fact * fact + 54;
             image = image1;
             haut *= fact;
             large *= fact;
-            taille *= fact * fact;
             byte[] temp = Convertir_Int_To_Endian(large,4);
             for(int i = 0; i < 4; i++) { header[18+i] = temp[i]; }
             temp = Convertir_Int_To_Endian(haut, 4);
             for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
             temp = Convertir_Int_To_Endian(taille+54, 4);
+            for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
+        }
+
+        public void Reduction(int fact)
+        {
+            Console.WriteLine();
+            Pixel[,] image1 = new Pixel[haut /fact, large /fact];
+            for (int j = 0; j < this.haut/fact; j++)
+            {
+                for (int i = 0; i < this.large/fact; i++)
+                {
+                    for (int ii = 0; ii < fact; ii++)
+                    {
+                            image1[j, i] = image[j*fact, i*fact];
+                    }
+
+                }
+            }
+            taille = (taille - 54) / (fact * fact) + 54;
+            image = image1;
+            haut /= fact;
+            large /= fact;
+            byte[] temp = Convertir_Int_To_Endian(large, 4);
+            for (int i = 0; i < 4; i++) { header[18 + i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(haut, 4);
+            for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(taille + 54, 4);
             for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
         }
 

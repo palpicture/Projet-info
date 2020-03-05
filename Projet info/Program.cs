@@ -12,8 +12,8 @@ namespace Projet_info
         {
             MyImage image = new MyImage("coco.bmp");
             //image.ConvertToGris();
-            image.Agrandissement(3);
-            image.From_Image_To_File("COCOgrand.bmp");
+            image.Reduction(2);
+            image.From_Image_To_File("COCOpetit.bmp");
             Console.ReadKey();
         }
     }
