@@ -106,6 +106,71 @@ namespace Projet_info
             }
         }
 
+        public void Agrandissement(int fact)
+        {
+            Pixel[,] image1 = new Pixel[haut*fact, large*fact];
+            for (int j = 0; j < this.haut; j++)
+            {
+                for (int i = 0; i < this.large; i++)
+                {
+                    for (int ii = 0;ii<fact;ii++)
+                    {
+                        for (int jj = 0; jj < fact; jj++)
+                        {
+                            image1[j*fact + jj, i*fact + ii] = image[j, i];
+                        }
+                    }
+                        
+                }
+            }
+            image = image1;
+            haut *= fact;
+            large *= fact;
+            taille *= fact * fact;
+            byte[] temp = Convertir_Int_To_Endian(large,4);
+            for(int i = 0; i < 4; i++) { header[18+i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(haut, 4);
+            for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(taille+54, 4);
+            for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
 
+        }
+
+        public void Miroir(char x)
+        {
+            Pixel[,] image1=new Pixel[image.GetLength(0), image.GetLength(1)];
+            if (x == 'H')
+            {
+                for (int j = 0; j < this.haut; j++)
+                {
+                    for (int i = 0; i < this.large; i++)
+                    {
+                        image1[j, i] = image[j, this.large - 1 - i];
+                    }
+                }
+                image = image1;
+            }
+
+
+
+            else if (x == 'V')
+            {
+                for (int i = 0; i < this.large; i++)
+                {
+                    for (int j = 0; j < this.haut; j++)
+                    {
+                        image1[j, i] = image[this.haut - j, i];
+                    }
+                }
+                image = image1;
+            }
+
+
+
+            else
+            {
+                Console.WriteLine("Vous n'avez pas choisi V ou H");
+            }
+        }
     }
 }

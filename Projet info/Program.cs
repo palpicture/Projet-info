@@ -12,7 +12,7 @@ namespace Projet_info
         {
             MyImage image = new MyImage("coco.bmp");
             //image.ConvertToGris();
-            image.ConvertToGris();
+            image.Agrandissement(2);
             image.From_Image_To_File("COCOgris.bmp");
             Console.ReadKey();
         }
