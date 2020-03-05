@@ -53,14 +53,17 @@ namespace Projet_info
         //Méthode pour passer d'un entier en un tableau de bytes avec une boucle for sur le nombre d'octets sur lequel on veut faire la conversion
         private byte[] Convertir_Int_To_Endian(int val, int nboctet)
         {
-            int i = val;
-            byte[] tab= new byte[nboctet];
-            for (int a=0; a<nboctet; a++)
+            byte[] res = new byte[nboctet];
+            int reste = val % 256;
+            res[0] = (byte)reste;
+            val -= reste;
+            for (int i = nboctet - 1; i > 0; i--)
             {
-                tab[a] = Convert.ToByte(i%256);
-                i -= tab[a]*(int)(Math.Pow(256,a));
+                int temp = val / ((int)Math.Pow(256, i));
+                res[i] = (byte)temp;
+                val -=  ((int)Math.Pow(256, i) * temp);
             }
-            return tab;
+            return res;
         }
 
         //Méthode pour accéder aux pixels de l'image sans le header
@@ -115,6 +118,8 @@ namespace Projet_info
 
         public void Agrandissement(int fact)
         {
+            for (int i = 0; i < 54; i++) { Console.Write(header[i] + " "); }
+            Console.WriteLine();
             Pixel[,] image1 = new Pixel[haut*fact, large*fact];
             for (int j = 0; j < this.haut; j++)
             {
@@ -140,7 +145,7 @@ namespace Projet_info
             for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
             temp = Convertir_Int_To_Endian(taille+54, 4);
             for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
-
+            for(int i = 0; i < 54; i++) { Console.Write(header[i] + " "); }
         }
 
         public void Miroir(char x)
