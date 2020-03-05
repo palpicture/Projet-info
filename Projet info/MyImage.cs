@@ -118,7 +118,6 @@ namespace Projet_info
 
         public void Agrandissement(int fact)
         {
-            for (int i = 0; i < 54; i++) { Console.Write(header[i] + " "); }
             Console.WriteLine();
             Pixel[,] image1 = new Pixel[haut*fact, large*fact];
             for (int j = 0; j < this.haut; j++)
@@ -145,7 +144,6 @@ namespace Projet_info
             for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
             temp = Convertir_Int_To_Endian(taille+54, 4);
             for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
-            for(int i = 0; i < 54; i++) { Console.Write(header[i] + " "); }
         }
 
         public void Miroir(char x)
