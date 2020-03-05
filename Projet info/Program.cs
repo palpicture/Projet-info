@@ -18,5 +18,6 @@ namespace Projet_info
         }
         //test
         /// avoir fini de déboguer le pojet et avoir fini miroir, rotation changement de taille et ,=niveaux de gris
+        /// je dis n'importe quoi
     }
 }
