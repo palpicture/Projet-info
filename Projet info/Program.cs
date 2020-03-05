@@ -16,7 +16,7 @@ namespace Projet_info
             image.From_Image_To_File("COCOgrand.bmp");
             Console.ReadKey();
         }
-
+        //test
         /// avoir fini de déboguer le pojet et avoir fini miroir, rotation changement de taille et ,=niveaux de gris
     }
 }
