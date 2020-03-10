@@ -217,13 +217,15 @@ namespace Projet_info
             {
                 for (int j = 0; j < this.large; j++)
                 {
-                    int tempj = Convert.ToInt32(i * Math.Cos(angle));
-                    int tempi = Convert.ToInt32(j * Math.Sin(angle));
-                    if (tempi < large && tempj < haut && 0<tempi && 0 < tempj) { image1[i, j] = image[tempj, tempi]; }
+                    int tempj = Convert.ToInt32(i * Math.Cos(angle) - j * Math.Sin(angle));
+                    int tempi = Convert.ToInt32(i * Math.Sin(angle) + j * Math.Cos(angle));
+                    if (tempi < large && tempj < haut && 0 < tempi && 0 < tempj) { image1[i, j] = image[tempj, tempi]; }
                     else { image1[i, j] = new Pixel((byte)0, (byte)0, (byte)0); }
                 }
             }
             image = image1;
         }
+
+
     }
 }
