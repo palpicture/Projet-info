@@ -249,9 +249,23 @@ namespace Projet_info
             Convolution(matrice);
         }
 
+        public void DetecBord()
+        {
+            int[,] matrice = new int[3, 3] { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+            Convolution(matrice);
+        }
 
+        public void RenfocementBords()
+        {
+            int[,] matrice = new int[3, 3] { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
+            Convolution(matrice);
+        }
 
-
+        public void Repoussage()
+        {
+            int[,] matrice = new int[3, 3] { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
+            Convolution(matrice);
+        }
 
         private Pixel Operation(int[,] matrice, int i, int j)
         {
