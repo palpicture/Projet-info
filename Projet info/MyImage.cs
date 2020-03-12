@@ -33,11 +33,25 @@ namespace Projet_info
             this.couleur = Convertir_Endian_To_Int(new byte[] { image[28], image[29] }) / 8;
             this.image = GoImage(image, large, haut, offset, taille);
             this.header = new byte[54];
-            for (int i = 0; i < 54; i++) { header[i] = image[i]; }
+            for(int i = 0; i < 54; i++) { header[i] = image[i]; }
 
         }
 
-        public MyImage()
+        public MyImage(int large, int haut, int Z0)
+        {
+            this.large = large;
+            this.haut = haut;
+            type = "bmp";
+            taille = haut * large + 54;
+            offset = 40;
+            couleur = 3;
+            byte[] tailletab = Convertir_Int_To_Endian(taille,4);
+            byte[] hauttab = Convertir_Int_To_Endian(haut, 4);
+            byte[] largetab = Convertir_Int_To_Endian(large, 4);
+            header = new byte[54] { 66, 77, tailletab[0], tailletab[1], tailletab[2], tailletab[3], 0, 0, 0, 0, 54, 0, 0, 0, 40, 0, 0, 0, largetab[0], largetab[1], largetab[2], largetab[3], hauttab[0], hauttab[1], hauttab[2], hauttab[3], 1, 0, 24, 0, 0, 0, 0, 0, 176, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            image = new Pixel[haut, large];
+            Fractale(Z0);
+        }
 
         //Métohde pour passer d'un tableau de byte en entier avec une boucle for sur tous les bytes du tableau
         private int Convertir_Endian_To_Int(byte[] tab)
@@ -63,7 +77,7 @@ namespace Projet_info
             {
                 int temp = val / ((int)Math.Pow(256, i));
                 res[i] = (byte)temp;
-                val -= ((int)Math.Pow(256, i) * temp);
+                val -=  ((int)Math.Pow(256, i) * temp);
             }
             return res;
         }
@@ -73,9 +87,9 @@ namespace Projet_info
         {
             Pixel[,] tab = new Pixel[haut, large];
             int i = offset + 14;
-            for (int y = 0; y < haut; y++)
+            for (int y = 0;y<haut;y++)
             {
-                for (int x = 0; x < large; x++)
+                for (int x=0;x<large;x++)
                 {
                     tab[y, x] = new Pixel(image[i], image[i + 1], image[i + 2]);
                     i += 3;
@@ -85,33 +99,33 @@ namespace Projet_info
         }
 
         //Méthode pour passer d'une image à un fichier en recréant le header puis l'image et en le mettant dans un fichier 
-        public void From_Image_To_File(string file)
+        public void From_Image_To_File (string file)
         {
             byte[] myfile = new byte[this.taille];
-            for (int i = 0; i < 54; i++)
+            for(int i =0;i<54;i++)
             {
                 myfile[i] = header[i];
             }
             int index = 54;
-            for (int y = 0; y < haut; y++)
+            for (int y=0;y<haut;y++)
             {
-                for (int x = 0; x < large; x++)
+                for(int x =0;x<large;x++)
                 {
-                    myfile[index] = image[y, x].Red;
-                    myfile[index + 1] = image[y, x].Green;
-                    myfile[index + 2] = image[y, x].Blue;
+                    if (index < taille) { myfile[index] = image[y, x].Red; }
+                    if (index +1 < taille) myfile[index+1] = image[y, x].Green;
+                    if (index +2 < taille) myfile[index+2] = image[y, x].Blue;
                     index += 3;
                 }
             }
             File.WriteAllBytes(file, myfile);
-        }
+        } 
 
 
         public void ConvertToGris()
         {
-            for (int j = 0; j < this.haut; j++)
+            for (int j=0; j<this.haut; j++)
             {
-                for (int i = 0; i < this.large; i++)
+                for (int i = 0;i<this.large;i++)
                 {
                     image[j, i].ConvertToGris();
                 }
@@ -121,43 +135,43 @@ namespace Projet_info
         public void Agrandissement(int fact)
         {
             Console.WriteLine();
-            Pixel[,] image1 = new Pixel[haut * fact, large * fact];
+            Pixel[,] image1 = new Pixel[haut*fact, large*fact];
             for (int j = 0; j < this.haut; j++)
             {
                 for (int i = 0; i < this.large; i++)
                 {
-                    for (int ii = 0; ii < fact; ii++)
+                    for (int ii = 0;ii<fact;ii++)
                     {
                         for (int jj = 0; jj < fact; jj++)
                         {
-                            image1[j * fact + jj, i * fact + ii] = image[j, i];
+                            image1[j*fact + jj, i*fact + ii] = image[j, i];
                         }
-                    }
+                    }      
                 }
             }
             taille = (taille - 54) * fact * fact + 54;
             image = image1;
             haut *= fact;
             large *= fact;
-            byte[] temp = Convertir_Int_To_Endian(large, 4);
-            for (int i = 0; i < 4; i++) { header[18 + i] = temp[i]; }
+            byte[] temp = Convertir_Int_To_Endian(large,4);
+            for(int i = 0; i < 4; i++) { header[18+i] = temp[i]; }
             temp = Convertir_Int_To_Endian(haut, 4);
             for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
-            temp = Convertir_Int_To_Endian(taille + 54, 4);
+            temp = Convertir_Int_To_Endian(taille+54, 4);
             for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
         }
 
         public void Reduction(int fact)
         {
             Console.WriteLine();
-            Pixel[,] image1 = new Pixel[haut / fact, large / fact];
-            for (int j = 0; j < this.haut / fact; j++)
+            Pixel[,] image1 = new Pixel[haut /fact, large /fact];
+            for (int j = 0; j < this.haut/fact; j++)
             {
-                for (int i = 0; i < this.large / fact; i++)
+                for (int i = 0; i < this.large/fact; i++)
                 {
                     for (int ii = 0; ii < fact; ii++)
                     {
-                        image1[j, i] = image[j * fact, i * fact];
+                            image1[j, i] = image[j*fact, i*fact];
                     }
 
                 }
@@ -176,7 +190,7 @@ namespace Projet_info
 
         public void Miroir(char x)
         {
-            Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
+            Pixel[,] image1=new Pixel[image.GetLength(0), image.GetLength(1)];
             if (x == 'H')
             {
                 for (int j = 0; j < this.haut; j++)
@@ -197,7 +211,7 @@ namespace Projet_info
                 {
                     for (int j = 0; j < this.haut; j++)
                     {
-                        image1[j, i] = image[this.haut - 1 - j, i];
+                        image1[j, i] = image[this.haut -1 - j, i];
                     }
                 }
                 image = image1;
@@ -211,7 +225,7 @@ namespace Projet_info
             }
         }
 
-        public void Rotation(int angle)
+        public void Rotation1(int angle)
         {
             int taille1 = Convert.ToInt32(Math.Sqrt(haut * haut + large * large));
             Pixel[,] image1 = new Pixel[taille1, taille1];
@@ -286,18 +300,18 @@ namespace Projet_info
             Convolution(matrice);
         }
 
-        public void Fractale(double Z0)
+        private void Fractale (double Z0)
         {
-            for (int i = 0; i < large; i++)
+            for(int i = 0; i<large;i++)
             {
-                for (int j = 0; i < haut; j++)
+                for(int j=0;j<haut;j++)
                 {
-                    double X = i * i - j * j + Z0;
-                    double Y = 2 * i * j + Z0;
+                    double X = i*i-j*j+Z0;
+                    double Y = 2*i*j+Z0;
                     double mod = Math.Sqrt(X * X + Y * Y);
                     bool test = true;
                     int essai = 1;
-                    while (test && essai < 20)
+                    while(test && essai < 20)
                     {
                         double Temp = X * X - Y * Y - Z0;
                         Y = 2 * X * Y + Z0;
@@ -382,7 +396,5 @@ namespace Projet_info
             Pixel res = new Pixel(r, g, b);
             return res;
         }
-
-
     }
 }
