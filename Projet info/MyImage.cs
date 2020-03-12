@@ -37,7 +37,21 @@ namespace Projet_info
 
         }
 
-        public MyImage()
+        public MyImage(int large, int haut, int Z0)
+        {
+            this.large = large;
+            this.haut = haut;
+            type = "bmp";
+            taille = haut * large + 54;
+            offset = 40;
+            couleur = 3;
+            byte[] tailletab = Convertir_Int_To_Endian(taille,4);
+            byte[] hauttab = Convertir_Int_To_Endian(haut, 4);
+            byte[] largetab = Convertir_Int_To_Endian(large, 4);
+            header = new byte[54] { 66, 77, tailletab[0], tailletab[1], tailletab[2], tailletab[3], 0, 0, 0, 0, 54, 0, 0, 0, 40, 0, 0, 0, largetab[0], largetab[1], largetab[2], largetab[3], hauttab[0], hauttab[1], hauttab[2], hauttab[3], 1, 0, 24, 0, 0, 0, 0, 0, 176, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            image = new Pixel[haut, large];
+            Fractale(Z0);
+        }
 
         //Métohde pour passer d'un tableau de byte en entier avec une boucle for sur tous les bytes du tableau
         private int Convertir_Endian_To_Int(byte[] tab)
@@ -97,9 +111,9 @@ namespace Projet_info
             {
                 for(int x =0;x<large;x++)
                 {
-                    myfile[index] = image[y,x].Red;
-                    myfile[index+1] = image[y, x].Green;
-                    myfile[index+2] = image[y, x].Blue;
+                    if (index < taille) { myfile[index] = image[y, x].Red; }
+                    if (index +1 < taille) myfile[index+1] = image[y, x].Green;
+                    if (index +2 < taille) myfile[index+2] = image[y, x].Blue;
                     index += 3;
                 }
             }
@@ -286,11 +300,11 @@ namespace Projet_info
             Convolution(matrice);
         }
 
-        public void Fractale (double Z0)
+        private void Fractale (double Z0)
         {
             for(int i = 0; i<large;i++)
             {
-                for(int j=0;i<haut;j++)
+                for(int j=0;j<haut;j++)
                 {
                     double X = i*i-j*j+Z0;
                     double Y = 2*i*j+Z0;
@@ -306,7 +320,7 @@ namespace Projet_info
                         test = mod > 2;
                     }
                     if (test) { image[j, i] = new Pixel((byte)0, (byte)0, (byte)0); }
-                    else { image[j, i] = new Pixel((byte)255, (byte)0, (byte)0)}
+                    else { image[j, i] = new Pixel((byte)255, (byte)0, (byte)0); }
                 }
             }
         }
