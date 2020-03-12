@@ -12,7 +12,7 @@ namespace Projet_info
         {
             MyImage image = new MyImage("coco.bmp");
             //image.ConvertToGris();
-            image.Rot(27);
+            image.Rotation(27);
             image.From_Image_To_File("COCOrot.bmp");
             Console.ReadKey();
         }
