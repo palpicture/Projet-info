@@ -224,5 +224,23 @@ namespace Projet_info
             }
             image = image1;
         }
+
+        public void Rot(int angle)
+        {
+            Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
+            for (int i = 0; i < this.haut; i++)
+            {
+                for (int j = 0; j < this.large; j++)
+                {
+                    if (0 < i && i < haut / 2 && 0 < j && j < large / 2 && i + j < haut / 2)
+                    {
+                        int tempj = Convert.ToInt32(i * Math.Cos(angle) - j * Math.Sin(angle));
+                        int tempi = Convert.ToInt32(i * Math.Sin(angle) + j * Math.Cos(angle));
+                        image1[i, j] = image[tempj, tempi];
+                    }
+                }
+            }
+        }
+
     }
 }
