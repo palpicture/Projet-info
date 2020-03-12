@@ -211,20 +211,38 @@ namespace Projet_info
             }
         }
 
-        public void Rotation(int angle)
+        public void Rotation1(int angle)
         {
-            Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
+            int taille1 = Convert.ToInt32(Math.Sqrt(haut * haut + large * large));
+            Pixel[,] image1 = new Pixel[taille1, taille1];
+            for (int k = 0; k < taille1; k++)
+            {
+                for (int l = 0; l < taille1; l++)
+                {
+                    image1[k, l] = new Pixel((byte)0, (byte)0, (byte)0);
+                }
+            }
+
             for (int i = 0; i < this.haut; i++)
             {
                 for (int j = 0; j < this.large; j++)
                 {
                     int tempj = Convert.ToInt32(i * Math.Cos(angle) - j * Math.Sin(angle));
                     int tempi = Convert.ToInt32(i * Math.Sin(angle) + j * Math.Cos(angle));
-                    if (tempi < large && tempj < haut && 0 < tempi && 0 < tempj) { image1[i, j] = image[tempj, tempi]; }
+                    if (tempi < large && tempj < haut && 0 <= tempi && 0 <= tempj) { image1[i, j] = image[tempj, tempi]; }
                     else { image1[i, j] = new Pixel((byte)0, (byte)0, (byte)0); }
                 }
             }
             image = image1;
+            haut = taille1;
+            large = taille1;
+            taille = haut * large * 3;
+            byte[] temp = Convertir_Int_To_Endian(large, 4);
+            for (int i = 0; i < 4; i++) { header[18 + i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(haut, 4);
+            for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(taille + 54, 4);
+            for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
         }
 
         public void Convolution(int[,] matrice)
