@@ -37,6 +37,8 @@ namespace Projet_info
 
         }
 
+        public MyImage()
+
         //Métohde pour passer d'un tableau de byte en entier avec une boucle for sur tous les bytes du tableau
         private int Convertir_Endian_To_Int(byte[] tab)
         {
@@ -264,6 +266,31 @@ namespace Projet_info
         {
             int[,] matrice = new int[3, 3] { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
             Convolution(matrice);
+        }
+
+        public void Fractale (double Z0)
+        {
+            for(int i = 0; i<large;i++)
+            {
+                for(int j=0;i<haut;j++)
+                {
+                    double X = i*i-j*j+Z0;
+                    double Y = 2*i*j+Z0;
+                    double mod = Math.Sqrt(X * X + Y * Y);
+                    bool test = true;
+                    int essai = 1;
+                    while(test && essai < 20)
+                    {
+                        double Temp = X * X - Y * Y - Z0;
+                        Y = 2 * X * Y + Z0;
+                        X = Temp;
+                        mod = Math.Sqrt(X * X + Y * Y);
+                        test = mod > 2;
+                    }
+                    if (test) { image[j, i] = new Pixel((byte)0, (byte)0, (byte)0); }
+                    else { image[j, i] = new Pixel((byte)255, (byte)0, (byte)0)}
+                }
+            }
         }
 
         private Pixel Operation(int[,] matrice, int i, int j)
