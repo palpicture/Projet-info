@@ -130,18 +130,46 @@ namespace Projet_info
                         {
                             image1[j*fact + jj, i*fact + ii] = image[j, i];
                         }
-                    }      
+                    }
+                        
                 }
             }
+            taille = (taille - 54) * fact * fact + 54;
             image = image1;
             haut *= fact;
             large *= fact;
-            taille *= fact * fact;
             byte[] temp = Convertir_Int_To_Endian(large,4);
             for(int i = 0; i < 4; i++) { header[18+i] = temp[i]; }
             temp = Convertir_Int_To_Endian(haut, 4);
             for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
             temp = Convertir_Int_To_Endian(taille+54, 4);
+            for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
+        }
+
+        public void Reduction(int fact)
+        {
+            Console.WriteLine();
+            Pixel[,] image1 = new Pixel[haut /fact, large /fact];
+            for (int j = 0; j < this.haut/fact; j++)
+            {
+                for (int i = 0; i < this.large/fact; i++)
+                {
+                    for (int ii = 0; ii < fact; ii++)
+                    {
+                            image1[j, i] = image[j*fact, i*fact];
+                    }
+
+                }
+            }
+            taille = (taille - 54) / (fact * fact) + 54;
+            image = image1;
+            haut /= fact;
+            large /= fact;
+            byte[] temp = Convertir_Int_To_Endian(large, 4);
+            for (int i = 0; i < 4; i++) { header[18 + i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(haut, 4);
+            for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
+            temp = Convertir_Int_To_Endian(taille + 54, 4);
             for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
         }
 
@@ -182,22 +210,6 @@ namespace Projet_info
             }
         }
 
-        public void Rotationbis(int angle)
-        {
-            Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
-            for (int i = 0; i < this.haut; i++)
-            {
-                for (int j = 0; j < this.large; j++)
-                {
-                    int tempj = Convert.ToInt32(i * Math.Cos(angle));
-                    int tempi = Convert.ToInt32(j * Math.Sin(angle));
-                    if (tempi < large && tempj < haut && 0<tempi && 0 < tempj) { image1[i, j] = image[tempj, tempi]; }
-                    else { image1[i, j] = new Pixel((byte)0, (byte)0, (byte)0); }
-                }
-            }
-            image = image1;
-        }
-
         public void Rotation(int angle)
         {
             Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
@@ -211,7 +223,121 @@ namespace Projet_info
                     else { image1[i, j] = new Pixel((byte)0, (byte)0, (byte)0); }
                 }
             }
-            image = image1; 
+            image = image1;
         }
+
+        public void Convolution (int[,] matrice)
+        {
+            Pixel[,] temp = new Pixel[haut, large];
+            if(matrice.GetLength(0)==3 && matrice.GetLength(1) == 3)
+            {
+                for(int i = 0; i<large; i++)
+                {
+                    for(int j=0; j<haut; j++)
+                    {
+                        temp[j,i]=Operation(matrice, i, j);
+                    }
+                }
+                image = temp;
+            }
+            else { Console.WriteLine("erreur"); }
+        }
+
+        public void Flou()
+        {
+            int[,] matrice = new int[3, 3] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
+            Convolution(matrice);
+        }
+
+        public void DetecBord()
+        {
+            int[,] matrice = new int[3, 3] { { 0, 1, 0 }, { 1, -4, 1 }, { 0, 1, 0 } };
+            Convolution(matrice);
+        }
+
+        public void RenfocementBords()
+        {
+            int[,] matrice = new int[3, 3] { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
+            Convolution(matrice);
+        }
+
+        public void Repoussage()
+        {
+            int[,] matrice = new int[3, 3] { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
+            Convolution(matrice);
+        }
+
+        private Pixel Operation(int[,] matrice, int i, int j)
+        {
+            byte r;
+            byte g;
+            byte b;
+            if(i==0)
+            {
+                if(j==0)
+                {
+                    r = (byte)((image[j, i].Red * matrice[1, 1] + image[j, i + 1].Red * matrice[1, 2] + image[j + 1, i].Red * matrice[2, 1] + image[j + 1, i + 1].Red * matrice[2, 2])/4);
+                    g = (byte)((image[j, i].Green * matrice[1, 1] + image[j, i + 1].Green * matrice[1, 2] + image[j + 1, i].Green * matrice[2, 1] + image[j + 1, i + 1].Green * matrice[2, 2])/4);
+                    b = (byte)((image[j, i].Blue * matrice[1, 1] + image[j, i + 1].Blue * matrice[1, 2] + image[j + 1, i].Blue * matrice[2, 1] + image[j + 1, i + 1].Blue * matrice[2, 2]) / 4);
+                }
+                else if (j==haut-1)
+                {
+                    r = (byte)((image[j - 1, i].Red * matrice[0, 1] + image[j - 1, i + 1].Red * matrice[0, 2] + image[j, i].Red * matrice[1, 1] + image[j, i + 1].Red * matrice[1, 2]) / 4);
+                    g = (byte)((image[j - 1, i].Green * matrice[0, 1] + image[j - 1, i + 1].Green * matrice[0, 2] + image[j, i].Green * matrice[1, 1] + image[j, i + 1].Green * matrice[1, 2]) / 4);
+                    b = (byte)((image[j - 1, i].Blue * matrice[0, 1] + image[j - 1, i + 1].Blue * matrice[0, 2] + image[j, i].Blue * matrice[1, 1] + image[j, i + 1].Blue * matrice[1, 2]) / 4);
+                }
+                else
+                {
+                    r = (byte)((image[j - 1, i].Red * matrice[0, 1] + image[j - 1, i + 1].Red * matrice[0, 2] + image[j, i].Red * matrice[1, 1] + image[j, i + 1].Red * matrice[1, 2] + image[j + 1, i].Red * matrice[2, 1] + image[j + 1, i + 1].Red * matrice[2, 2]) / 6);
+                    g = (byte)((image[j - 1, i].Green * matrice[0, 1] + image[j - 1, i + 1].Green * matrice[0, 2] + image[j, i].Green * matrice[1, 1] + image[j, i + 1].Green * matrice[1, 2] + image[j + 1, i].Green * matrice[2, 1] + image[j + 1, i + 1].Green * matrice[2, 2]) / 6);
+                    b = (byte)((image[j - 1, i].Blue * matrice[0, 1] + image[j - 1, i + 1].Blue * matrice[0, 2] + image[j, i].Blue * matrice[1, 1] + image[j, i + 1].Blue * matrice[1, 2] + image[j + 1, i].Blue * matrice[2, 1] + image[j + 1, i + 1].Blue * matrice[2, 2]) / 6);
+                }
+            }
+            else if (i==large-1)
+            {
+                if (j==0)
+                {
+                    r = (byte)((image[j, i - 1].Red * matrice[1, 0] + image[j, i].Red * matrice[1, 1] + image[j + 1, i - 1].Red * matrice[2, 0] + image[j + 1, i].Red * matrice[2, 1]) / 4);
+                    g = (byte)((image[j, i - 1].Green * matrice[1, 0] + image[j, i].Green * matrice[1, 1] + image[j + 1, i - 1].Green * matrice[2, 0] + image[j + 1, i].Green * matrice[2, 1]) / 4);
+                    b = (byte)((image[j, i - 1].Blue * matrice[1, 0] + image[j, i].Blue * matrice[1, 1] + image[j + 1, i - 1].Blue * matrice[2, 0] + image[j + 1, i].Blue * matrice[2, 1]) / 4);
+
+                }
+                else if (j==haut-1)
+                {
+                    r = (byte)((image[j - 1, i - 1].Red * matrice[0, 0] + image[j - 1, i].Red * matrice[0, 1] + image[j, i - 1].Red * matrice[1, 0] + image[j, i].Red * matrice[1, 1]) / 4);
+                    g = (byte)((image[j - 1, i - 1].Green * matrice[0, 0] + image[j - 1, i].Green * matrice[0, 1] + image[j, i - 1].Green * matrice[1, 0] + image[j, i].Green * matrice[1, 1]) / 4);
+                    b = (byte)((image[j - 1, i - 1].Blue * matrice[0, 0] + image[j - 1, i].Blue * matrice[0, 1] + image[j, i - 1].Blue * matrice[1, 0] + image[j, i].Blue * matrice[1, 1]) / 4);
+                }
+                else
+                {
+                    r = (byte)((image[j - 1, i - 1].Red * matrice[0, 0] + image[j - 1, i].Red * matrice[0, 1] + image[j, i - 1].Red * matrice[1, 0] + image[j, i].Red * matrice[1, 1] + image[j + 1, i - 1].Red * matrice[2, 0] + image[j + 1, i].Red * matrice[2, 1]) / 6);
+                    g = (byte)((image[j - 1, i - 1].Green * matrice[0, 0] + image[j - 1, i].Green * matrice[0, 1] + image[j, i - 1].Green * matrice[1, 0] + image[j, i].Green * matrice[1, 1] + image[j + 1, i - 1].Green * matrice[2, 0] + image[j + 1, i].Green * matrice[2, 1]) / 6);
+                    b = (byte)((image[j - 1, i - 1].Blue * matrice[0, 0] + image[j - 1, i].Blue * matrice[0, 1] + image[j, i - 1].Blue * matrice[1, 0] + image[j, i].Blue * matrice[1, 1] + image[j + 1, i - 1].Blue * matrice[2, 0] + image[j + 1, i].Blue * matrice[2, 1]) / 6);
+
+                }
+            }
+            else if(j==0)
+            {
+                r = (byte)((image[j, i - 1].Red * matrice[1, 0] + image[j, i].Red * matrice[1, 1] + image[j, i + 1].Red * matrice[1, 2] + image[j + 1, i - 1].Red * matrice[2, 0] + image[j + 1, i].Red * matrice[2, 1] + image[j + 1, i + 1].Red * matrice[2, 2]) / 6);
+                g = (byte)((image[j, i - 1].Green * matrice[1, 0] + image[j, i].Green * matrice[1, 1] + image[j, i + 1].Green * matrice[1, 2] + image[j + 1, i - 1].Green * matrice[2, 0] + image[j + 1, i].Green * matrice[2, 1] + image[j + 1, i + 1].Green * matrice[2, 2]) / 6);
+                b = (byte)((image[j, i - 1].Blue * matrice[1, 0] + image[j, i].Blue * matrice[1, 1] + image[j, i + 1].Blue * matrice[1, 2] + image[j + 1, i - 1].Blue * matrice[2, 0] + image[j + 1, i].Blue * matrice[2, 1] + image[j + 1, i + 1].Blue * matrice[2, 2]) / 6);
+
+            }
+            else if (j==haut-1)
+            {
+                r = (byte)((image[j - 1, i - 1].Red * matrice[0, 0] + image[j - 1, i].Red * matrice[0, 1] + image[j - 1, i + 1].Red * matrice[0, 2] + image[j, i - 1].Red * matrice[1, 0] + image[j, i].Red * matrice[1, 1] + image[j, i + 1].Red * matrice[1, 2]) / 6);
+                g = (byte)((image[j - 1, i - 1].Green * matrice[0, 0] + image[j - 1, i].Green * matrice[0, 1] + image[j - 1, i + 1].Green * matrice[0, 2] + image[j, i - 1].Green * matrice[1, 0] + image[j, i].Green * matrice[1, 1] + image[j, i + 1].Green * matrice[1, 2]) / 6);
+                b = (byte)((image[j - 1, i - 1].Blue * matrice[0, 0] + image[j - 1, i].Blue * matrice[0, 1] + image[j - 1, i + 1].Blue * matrice[0, 2] + image[j, i - 1].Blue * matrice[1, 0] + image[j, i].Blue * matrice[1, 1] + image[j, i + 1].Blue * matrice[1, 2]) / 6);
+            }
+            else 
+            {
+                r = (byte)((image[j - 1, i - 1].Red * matrice[0, 0] + image[j - 1, i].Red * matrice[0, 1] + image[j - 1, i + 1].Red * matrice[0, 2] + image[j, i - 1].Red * matrice[1, 0] + image[j, i].Red * matrice[1, 1] + image[j, i + 1].Red * matrice[1, 2] + image[j + 1, i - 1].Red * matrice[2, 0] + image[j + 1, i].Red * matrice[2, 1] + image[j + 1, i + 1].Red * matrice[2, 2]) / 9);
+                g = (byte)((image[j - 1, i - 1].Green * matrice[0, 0] + image[j - 1, i].Green * matrice[0, 1] + image[j - 1, i + 1].Green * matrice[0, 2] + image[j, i - 1].Green * matrice[1, 0] + image[j, i].Green * matrice[1, 1] + image[j, i + 1].Green * matrice[1, 2] + image[j + 1, i - 1].Green * matrice[2, 0] + image[j + 1, i].Green * matrice[2, 1] + image[j + 1, i + 1].Green * matrice[2, 2]) / 9);
+                b = (byte)((image[j - 1, i - 1].Blue * matrice[0, 0] + image[j - 1, i].Blue * matrice[0, 1] + image[j - 1, i + 1].Blue * matrice[0, 2] + image[j, i - 1].Blue * matrice[1, 0] + image[j, i].Blue * matrice[1, 1] + image[j, i + 1].Blue * matrice[1, 2] + image[j + 1, i - 1].Blue * matrice[2, 0] + image[j + 1, i].Blue * matrice[2, 1] + image[j + 1, i + 1].Blue * matrice[2, 2]) / 9);
+            }
+            Pixel res = new Pixel(r, g, b);
+            return res;
+        }
+
     }
 }
