@@ -130,8 +130,7 @@ namespace Projet_info
                         {
                             image1[j*fact + jj, i*fact + ii] = image[j, i];
                         }
-                    }
-                        
+                    }      
                 }
             }
             image = image1;
@@ -183,7 +182,7 @@ namespace Projet_info
             }
         }
 
-        public void Rotation(int angle)
+        public void Rotationbis(int angle)
         {
             Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
             for (int i = 0; i < this.haut; i++)
@@ -197,6 +196,22 @@ namespace Projet_info
                 }
             }
             image = image1;
+        }
+
+        public void Rotation(int angle)
+        {
+            Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
+            for (int i = 0; i < this.haut; i++)
+            {
+                for (int j = 0; j < this.large; j++)
+                {
+                    int tempj = Convert.ToInt32(i * Math.Cos(angle) - j * Math.Sin(angle));
+                    int tempi = Convert.ToInt32(i * Math.Sin(angle) + j * Math.Cos(angle));
+                    if (tempi < large && tempj < haut && 0 < tempi && 0 < tempj) { image1[i, j] = image[tempj, tempi]; }
+                    else { image1[i, j] = new Pixel((byte)0, (byte)0, (byte)0); }
+                }
+            }
+            image = image1; 
         }
     }
 }
