@@ -211,7 +211,7 @@ namespace Projet_info
             }
         }
 
-        public void Rotationbis(int angle)
+        public void Rotation(int angle)
         {
             Pixel[,] image1 = new Pixel[image.GetLength(0), image.GetLength(1)];
             for (int i = 0; i < this.haut; i++)
