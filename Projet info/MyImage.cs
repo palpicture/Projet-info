@@ -34,15 +34,14 @@ namespace Projet_info
             this.image = GoImage(image, large, haut, offset, taille);
             this.header = new byte[54];
             for(int i = 0; i < 54; i++) { header[i] = image[i]; }
-
         }
 
-        public MyImage(int large, int haut, int Z0)
+        public MyImage(int large, int haut)
         {
             this.large = large;
             this.haut = haut;
             type = "bmp";
-            taille = haut * large + 54;
+            taille = haut * large * 3 + 54;
             offset = 40;
             couleur = 3;
             byte[] tailletab = Convertir_Int_To_Endian(taille,4);
@@ -50,7 +49,7 @@ namespace Projet_info
             byte[] largetab = Convertir_Int_To_Endian(large, 4);
             header = new byte[54] { 66, 77, tailletab[0], tailletab[1], tailletab[2], tailletab[3], 0, 0, 0, 0, 54, 0, 0, 0, 40, 0, 0, 0, largetab[0], largetab[1], largetab[2], largetab[3], hauttab[0], hauttab[1], hauttab[2], hauttab[3], 1, 0, 24, 0, 0, 0, 0, 0, 176, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             image = new Pixel[haut, large];
-            Fractale(Z0);
+            Fractale();
         }
 
         //Métohde pour passer d'un tableau de byte en entier avec une boucle for sur tous les bytes du tableau
@@ -227,35 +226,42 @@ namespace Projet_info
 
         public void Rotation1(int angle)
         {
-            int taille1 = Convert.ToInt32(Math.Sqrt(haut * haut + large * large));
+            int taille1 = Convert.ToInt32(Math.Sqrt(haut * haut + large * large))+1;
             Pixel[,] image1 = new Pixel[taille1, taille1];
+            Pixel[,] imageTemp = new Pixel[taille1, taille1];
+            int X = (taille1 - haut) / 2;
+            int Y = (taille1 - large) / 2;
             for (int k = 0; k < taille1; k++)
             {
                 for (int l = 0; l < taille1; l++)
                 {
-                    image1[k, l] = new Pixel((byte)0, (byte)0, (byte)0);
+                    image1[l, k] = new Pixel((byte)0, (byte)0, (byte)0);
+                    if(l>= X && l < X + haut && k >= Y && k < Y + large)
+                    { imageTemp[l, k] = image[l - X, k - Y]; }
+                    else { imageTemp[l, k] = new Pixel((byte)0, (byte)0, (byte)0); }
                 }
             }
+            image = imageTemp;
 
-            for (int i = 0; i < this.haut; i++)
+            for (int j = 0; j < taille1; j++)
             {
-                for (int j = 0; j < this.large; j++)
+                for (int i = 0; i < taille1; i++)
                 {
-                    int tempj = Convert.ToInt32(i * Math.Cos(angle) - j * Math.Sin(angle));
-                    int tempi = Convert.ToInt32(i * Math.Sin(angle) + j * Math.Cos(angle));
-                    if (tempi < large && tempj < haut && 0 <= tempi && 0 <= tempj) { image1[i, j] = image[tempj, tempi]; }
-                    else { image1[i, j] = new Pixel((byte)0, (byte)0, (byte)0); }
+                    int tempi = Convert.ToInt32(i * Math.Cos(angle) - j * Math.Sin(angle));
+                    int tempj = Convert.ToInt32(i * Math.Sin(angle) + j * Math.Cos(angle));
+                    if (tempj < taille1 && tempi < taille1 && 0 <= tempj && 0 <= tempi) { image1[tempj, tempi] = image[i, j]; }
+                    else if(0 <= tempj && 0 <= tempi) { image1[tempj, tempi] = new Pixel((byte)0, (byte)0, (byte)0); }
                 }
             }
             image = image1;
             haut = taille1;
             large = taille1;
-            taille = haut * large * 3;
+            taille = haut * large * 3 + 54;
             byte[] temp = Convertir_Int_To_Endian(large, 4);
             for (int i = 0; i < 4; i++) { header[18 + i] = temp[i]; }
             temp = Convertir_Int_To_Endian(haut, 4);
             for (int i = 0; i < 4; i++) { header[22 + i] = temp[i]; }
-            temp = Convertir_Int_To_Endian(taille + 54, 4);
+            temp = Convertir_Int_To_Endian(taille, 4);
             for (int i = 0; i < 4; i++) { header[2 + i] = temp[i]; }
         }
 
@@ -300,24 +306,29 @@ namespace Projet_info
             Convolution(matrice);
         }
 
-        private void Fractale (double Z0)
+        private void Fractale ()
         {
+            double l = 2 / (double)large;
+            double h = 2 / (double)haut;
             for(int i = 0; i<large;i++)
             {
                 for(int j=0;j<haut;j++)
                 {
-                    double X = i*i-j*j+Z0;
-                    double Y = 2*i*j+Z0;
+                    double X0=-1.5+(double)i*l;
+                    double Y0=-1+(double)j*h;
+                    double X = X0*X0-Y0*Y0+X0;
+                    double Y = 2*X0*Y0+Y0;
                     double mod = Math.Sqrt(X * X + Y * Y);
                     bool test = true;
                     int essai = 1;
                     while(test && essai < 20)
                     {
-                        double Temp = X * X - Y * Y - Z0;
-                        Y = 2 * X * Y + Z0;
+                        double Temp = X * X - Y * Y + X0;
+                        Y = 2 * X * Y + Y0;
                         X = Temp;
                         mod = Math.Sqrt(X * X + Y * Y);
-                        test = mod > 2;
+                        test = mod < 2;
+                        essai++;
                     }
                     if (test) { image[j, i] = new Pixel((byte)0, (byte)0, (byte)0); }
                     else { image[j, i] = new Pixel((byte)255, (byte)0, (byte)0); }
