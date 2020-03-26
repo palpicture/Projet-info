@@ -400,23 +400,35 @@ namespace Projet_info
         public void Histogramme(Pixel[,] image)
         {
             int taille2 = image.GetLength(0) * image.GetLength(1);
-            Pixel[,] hist = new Pixel[255, taille2];
-            for (int i = 0; i < image.GetLength(0); i++)
+            int[] R = new int[256];
+            int[] V = new int[256]; 
+            int[] B = new int[256];
+            int M = 1;
+            for (int k = 0; k < 256; k++)
+            {
+                R[k] = 0;
+                V[k] = 0;
+                B[k] = 0;
+            }
+
+            for (int i = 0; i< image.GetLength(0); i++)
             {
                 for (int j = 0; j < image.GetLength(1); j++)
                 {
-                    int compt = Convert.ToInt32(image[i, j]);
-                    int a = 0;
-                    for (int k = 255; i > 0; i--)
-                    {
-                        if (compt > 0)
-                        {
-
-                        }
-                    }
-
+                    int val1 = image[i, j].Red;
+                    int val2 = image[i, j].Green;
+                    int val3 = image[i, j].Blue;
+                    R[val1] += 1;
+                    V[val2] += 1;
+                    B[val3] += 1;
                 }
             }
+            for (int l = 0; l < 256; l++)
+            {
+
+            }
+            
+            Pixel[,] hist = new Pixel[255, M];
         }
     }
 }
