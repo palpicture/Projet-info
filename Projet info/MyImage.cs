@@ -436,10 +436,36 @@ namespace Projet_info
             }
             for (int l = 0; l < 256; l++)
             {
-
+                if (R[l] > M)
+                {
+                    M = R[l];
+                }
+                if (V[l] > M)
+                {
+                    M = V[l];
+                }
+                if (B[l] > M)
+                {
+                    M = B[l];
+                }
             }
             
             Pixel[,] hist = new Pixel[255, M];
+            for (int a = 0; a < 256; a++)
+            {
+                for (int b = 0; b < R[a]; b++)
+                {
+                    hist[a, M - b].Red = (byte) 255;
+                }
+                for (int b = 0; b < V[a]; b++)
+                {
+                    hist[a, M - b].Green = (byte) 255;
+                }
+                for (int b = 0; b < B[a]; b++)
+                {
+                    hist[a, M - b].Blue = (byte)255;
+                }
+            }
         }
     }
 }
