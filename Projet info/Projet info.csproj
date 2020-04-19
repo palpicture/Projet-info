@@ -44,9 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\..\..\Desktop\PROJET INFO\MyImage.cs">
-      <Link>MyImage.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\..\..\Desktop\PROJET INFO\Pixel.cs">
       <Link>Pixel.cs</Link>
     </Compile>
@@ -56,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\..\..\Desktop\PROJET INFO\MyImage 19.04" />
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
