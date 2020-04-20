@@ -19,7 +19,7 @@ namespace Projet_info
         int offset;
         int couleur;
         Pixel[,] image;
-        byte[] header;
+        public byte[] header;
 
         //Constructeur
         public MyImage(string fichier)
