@@ -412,9 +412,11 @@ namespace Projet_info
         {
             int taille2 = image.GetLength(0) * image.GetLength(1);
             int[] R = new int[256];
-            int[] V = new int[256]; 
+            int[] V = new int[256];
             int[] B = new int[256];
-            int M = 1;
+            byte val1 = 0;
+            byte val2 = 0;
+            byte val3 = 0;
             for (int k = 0; k < 256; k++)
             {
                 R[k] = 0;
@@ -422,24 +424,118 @@ namespace Projet_info
                 B[k] = 0;
             }
 
-            for (int i = 0; i< image.GetLength(0); i++)
+            for (int i = 0; i < image.GetLength(0); i++)
             {
                 for (int j = 0; j < image.GetLength(1); j++)
                 {
-                    int val1 = image[i, j].Red;
-                    int val2 = image[i, j].Green;
-                    int val3 = image[i, j].Blue;
+                    val1 = image[i, j].Red;
+                    val2 = image[i, j].Green;
+                    val3 = image[i, j].Blue;
                     R[val1] += 1;
                     V[val2] += 1;
                     B[val3] += 1;
                 }
             }
+
+            haut = 0;
             for (int l = 0; l < 256; l++)
             {
-
+                if (R[l] >= haut)
+                {
+                    haut = R[l];
+                }
+                if (V[l] >= haut)
+                {
+                    haut = V[l];
+                }
+                if (B[l] >= haut)
+                {
+                    haut = B[l];
+                }
             }
-            
-            Pixel[,] hist = new Pixel[255, M];
+
+            large = 788;
+            Pixel[,] hist = new Pixel[haut, large];
+            for (int i = 0; i < haut; i++)
+            {
+                for (int j = 0; j < large; j++)
+                {
+                    hist[i, j] = new Pixel(0, 0, 0);
+                }
+            }
+
+            for (int a = 0; a < haut; a++)
+            {
+                for (int b = 0; b < large; b++)
+                {
+                    hist[a, b].Red = 255;
+                    hist[a, b].Blue = 255;
+                    hist[a, b].Green = 255;
+                }
+            }
+
+            for (int m = 0; m < 255; m++)
+            {
+                for (int n = 0; n < R[m]; n++)
+                {
+                    hist[haut - n - 1, m] = new Pixel(0, 0, 0);
+                    hist[haut - n - 1, m].Red = 255;
+                    hist[haut - n - 1, m].Blue = 0;
+                    hist[haut - n - 1, m].Green = 0;
+                }
+            }
+
+            for (int m = 266; m < 521; m++)
+            {
+                for (int n = 0; n < B[m-266]; n++)
+                {
+                    hist[haut - n - 1, m] = new Pixel(0, 0, 0);
+                    hist[haut - n - 1, m].Red = 0;
+                    hist[haut - n - 1, m].Blue = 255;
+                    hist[haut - n - 1, m].Green = 0;
+                }
+            }
+
+            for (int m = 532; m < 788; m++)
+            {
+                for (int n = 0; n < V[m -532]; n++)
+                {
+                    hist[haut - n - 1, m] = new Pixel(0, 0, 0);
+                    hist[haut - n - 1, m].Red = 0;
+                    hist[haut - n - 1, m].Blue = 0;
+                    hist[haut - n - 1, m].Green = 255;
+                }
+            }
+
+            Pixel[,] Histogramme = new Pixel[haut, large];
+            for (int i = 0; i < haut; i++)
+            {
+                for (int j = 0; j < large; j++)
+                {
+                    Histogramme[i, j] = new Pixel(0, 0, 0);
+                }
+            }
+
+            for (int i = 0; i < haut; i++)
+            {
+                for (int j = 0; j < large; j++)
+                {
+                    Histogramme[i, j].Red = 255;
+                    Histogramme[i, j].Blue = 255;
+                    Histogramme[i, j].Green = 255;
+                }
+            }
+
+            for (int i = 0; i < haut; i++)
+            {
+                for (int j = 0; j < large; j++)
+                {
+                    Histogramme[haut - i - 1, j] = hist[i, j];
+                }
+            }
+
+            image = Histogramme;
+            From_Image_To_File(image);
         }
     }
 }
